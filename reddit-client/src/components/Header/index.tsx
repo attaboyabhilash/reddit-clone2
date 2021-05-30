@@ -13,7 +13,7 @@ const Header: React.FC<headerProps> = ({}) => {
     const router = useRouter()
     return (
         <Header className={styles.header}>
-            <h1 className={styles.title}>Reddit Clone</h1>
+            <Link href="/"><a><h1 className={styles.title}>Reddit Clone</h1></a></Link>
             <Menu theme="dark" mode="horizontal" defaultSelectedKeys={router.pathname === "/" ? ['1'] : router.pathname === "/login" ? ['2'] : router.pathname === "/register" ? ['3'] : ['']}>
                 <Menu.Item key="1"><Link href="/"><a>Home</a></Link></Menu.Item>
                 <Menu.Item key="2"><Link href="/login"><a>LogIn</a></Link></Menu.Item>
