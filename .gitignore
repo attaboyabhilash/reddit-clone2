@@ -1,0 +1,16 @@
+
+# Client
+/reddit-client/build
+/reddit-client/node_modules
+/reddit-client/.next
+
+
+# Server
+
+/reddit-server/build
+/reddit-server/node_modules
+/reddit-server/dist
+
+#extra
+
+/.vscode
