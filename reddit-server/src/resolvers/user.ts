@@ -1,7 +1,8 @@
-import { Arg, Ctx, Field, InputType, Mutation, ObjectType, Resolver } from "type-graphql";
+import { Arg, Ctx, Field, InputType, Mutation, ObjectType, Resolver, Query } from "type-graphql";
 import { MyContext } from "src/types";
 import { User } from "../entities/User";
 import argon2 from "argon2"
+import { COOKIE_NAME } from "../constants";
 
 @InputType()
 class UsernamePasswordInput {
@@ -29,6 +30,17 @@ class UserResponse {
 
 @Resolver()
 export class UserResolvers {
+
+    @Query(() => User, { nullable: true })
+    me(@Ctx() { em, req }: MyContext) {
+        // you are not logged in
+        if (!req.session.userId) {
+            return null;
+        }
+
+        return em.findOne(User, { _id: req.session.userId })
+    }
+
     @Mutation(() => UserResponse) 
     async register(
         @Arg('options') options: UsernamePasswordInput, 
@@ -96,4 +108,19 @@ export class UserResolvers {
     
         return {user}
     }
+
+    @Mutation(() => Boolean)
+    logout(
+        @Ctx() {req, res} : MyContext
+    ) {
+        return new Promise(resolve => req.session.destroy(err => {
+            res.clearCookie(COOKIE_NAME)
+            if(err){
+                console.log(err)
+                resolve(false)
+                return
+            } 
+            resolve(true)
+        }))
+    } 
 }

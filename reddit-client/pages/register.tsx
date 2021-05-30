@@ -6,25 +6,25 @@ import Link from 'next/link';
 import styles from "../styles/Register.module.scss"
 import { register } from '../src/types';
 import { useRegisterMutation } from '../src/generated/graphql';
-
-interface registerProps {
-
-}
+import { useRouter } from 'next/router';
 
 
-const Register: React.FC<registerProps> = ( { } ) => {
+const Register: React.FC<{}> = ( { } ) => {
   const [isLoading, setIsLoading] = useState(false)
   const [serverError, setServerError] = useState("")
   const formRef = useRef<FormInstance>();
+  const router = useRouter()
 
   const [, register] = useRegisterMutation()
 
   const onFinish = async ( values: register ) => {
     setIsLoading(true)
-    console.log( 'Received values of form: ', values )
+    //console.log( 'Received values of form: ', values )
     const response = await register(values)
     if(response.data?.register.errors) {
       setServerError(response.data.register.errors[0].message)
+    } else if (response.data?.register.user) {
+      router.push("/")
     }
     setIsLoading(false)
     formRef.current!.resetFields()

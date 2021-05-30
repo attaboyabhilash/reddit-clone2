@@ -1,8 +1,16 @@
 .header {
-    display: flex;
-    justify-content: space-between;
+   display: flex;
+   justify-content: space-between;
 
-    .title {
-        color: #f4f4f4;
-    }
+   .title {
+      color: #f4f4f4;
+   }
+
+   .loggedIn {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      width: 100px;
+      cursor: pointer;
+   }
 }
