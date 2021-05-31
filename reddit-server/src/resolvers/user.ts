@@ -2,9 +2,11 @@ import { Arg, Ctx, Field, Mutation, ObjectType, Resolver, Query } from "type-gra
 import { MyContext } from "src/types";
 import { User } from "../entities/User";
 import argon2 from "argon2"
-import { COOKIE_NAME } from "../constants";
+import { COOKIE_NAME, FORGOT_PASSWORD_PREFIX } from "../constants";
 import { UsernamePasswordInput } from "../utils/UsernamePasswordInput";
 import { validateRegister } from "../utils/validateRegister";
+import sendEmail from "../utils/sendEmail";
+import { v4 as uuid } from 'uuid'
 @ObjectType()
 class FieldError {
     @Field()
@@ -24,14 +26,23 @@ class UserResponse {
 @Resolver()
 export class UserResolvers {
 
-    // @Mutation(() => Boolean)
-    // async forgotPassword(
-    //     @Arg('email') email: string,
-    //     @Ctx() {em}: MyContext
-    // ) {
-    //     //const user = await em.findOne(User, {})
-    //     return true
-    // }
+    @Mutation(() => Boolean)
+    async forgotPassword(
+        @Arg('email') email: string,
+        @Ctx() {em, redis}: MyContext
+    ) {
+        const user = await em.findOne(User, { email })
+        if(!user) {
+            return true
+        }
+
+        const token = uuid()
+
+        redis.set(FORGOT_PASSWORD_PREFIX + token, user._id, 'ex', 1000 * 60 * 60 * 24 * 3)
+        
+        await sendEmail(email, `<a target="__blank" href="http://localhost:3000/change_password/${token}">reset password</a>`)
+        return true
+    }
 
     @Query(() => User, { nullable: true })
     me(@Ctx() { em, req }: MyContext) {
