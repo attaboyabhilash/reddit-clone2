@@ -5,6 +5,7 @@ import Link from 'next/link';
 import styles from "./Header.module.scss"
 import { useRouter } from 'next/router';
 import { useLogoutMutation, useMeQuery } from '../../generated/graphql';
+import { isServer } from '../../utils/isServer';
 
 interface headerProps {
 
@@ -12,9 +13,16 @@ interface headerProps {
 
 const Header: React.FC<headerProps> = ({}) => {
     const { Header } = Layout;
+    const router = useRouter()
     const [{ fetching: logoutFetching }, logout] = useLogoutMutation()
-    const [{ data, fetching }] = useMeQuery()
-
+    const [{ data, fetching }] = useMeQuery({
+        pause: isServer()
+    })
+    
+    const logoutPageChange = () => {
+        logout()
+        router.push('/login')
+    }
     const menu = (
         <Menu>
             <Menu.Item>
@@ -24,7 +32,7 @@ const Header: React.FC<headerProps> = ({}) => {
                 Your Settings
             </Menu.Item>
             <Menu.Item>
-                <Button loading={logoutFetching} type="primary" size="small" danger onClick={() => logout()}>Logout</Button>
+                <Button loading={logoutFetching} type="primary" size="small" danger onClick={() => logoutPageChange()}>Logout</Button>
             </Menu.Item>
         </Menu>
     );
@@ -39,15 +47,15 @@ const Header: React.FC<headerProps> = ({}) => {
                                 <Menu.Item key="1"><Link href="/login"><a>LogIn</a></Link></Menu.Item>
                                 <Menu.Item key="2"><Link href="/register"><a>Register</a></Link></Menu.Item>    
                             </>
-                        :   <div className={styles.loggedIn}>
-                                <Avatar style={{ backgroundColor: "#1890ff", verticalAlign: 'middle' }} size="large">
-                                    {data.me.username[0].toUpperCase()}
-                                </Avatar>
-                                {data.me.username}
-                                <Dropdown overlay={menu} placement="bottomCenter" arrow>
+                        :   <Dropdown overlay={menu} placement="bottomCenter" arrow>  
+                                <div className={styles.loggedIn}>
+                                    <Avatar style={{ backgroundColor: "#1890ff", verticalAlign: 'middle' }} size="large">
+                                        {data.me.username[0].toUpperCase()}
+                                    </Avatar>
+                                    {data.me.username}
                                     <CaretDownOutlined />
-                                </Dropdown>
-                            </div>
+                                </div>
+                            </Dropdown>
                 }
             </Menu>
         </Header>

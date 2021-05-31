@@ -7,6 +7,8 @@ import styles from "../styles/Register.module.scss"
 import { register } from '../src/types';
 import { useRegisterMutation } from '../src/generated/graphql';
 import { useRouter } from 'next/router';
+import { withUrqlClient } from 'next-urql';
+import { createUrqlClient } from '../src/utils/createUrqlClient';
 
 
 const Register: React.FC<{}> = ( { } ) => {
@@ -32,7 +34,7 @@ const Register: React.FC<{}> = ( { } ) => {
 
 
   return (
-    <>
+    <div className={styles.container}>
       <h1 className={styles.title}>Register</h1>
       <Card hoverable className={styles.register}>
         <Form
@@ -102,8 +104,9 @@ const Register: React.FC<{}> = ( { } ) => {
           </Form.Item>
         </Form>
       </Card>
-    </>
+    </div>
   );
 }
 
-export default Register
+export default withUrqlClient(createUrqlClient)(Register)
+

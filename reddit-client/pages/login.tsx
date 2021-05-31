@@ -3,10 +3,12 @@ import { Form, Input, Button, Card, Alert } from 'antd';
 import { UserOutlined, LockOutlined } from '@ant-design/icons';
 import { FormInstance } from 'antd/lib/form';
 import Link from 'next/link';
-import styles from "../styles/Register.module.scss"
+import styles from "../styles/Login.module.scss"
 import { register } from '../src/types';
 import { useLoginMutation } from '../src/generated/graphql';
 import { useRouter } from 'next/router';
+import { withUrqlClient } from 'next-urql';
+import { createUrqlClient } from '../src/utils/createUrqlClient';
 
 
 const Login: React.FC<{}> = ( { } ) => {
@@ -32,12 +34,12 @@ const Login: React.FC<{}> = ( { } ) => {
 
 
   return (
-    <>
+    <div className={styles.container}>
       <h1 className={styles.title}>Login</h1>
-      <Card hoverable className={styles.register}>
+      <Card hoverable className={styles.login}>
         <Form
-        name="register"
-        className="register-form"
+        name="login"
+        className="login-form"
         layout="vertical"
         ref={formRef}
         onFinish={onFinish}
@@ -76,15 +78,15 @@ const Login: React.FC<{}> = ( { } ) => {
               return <Alert key={err.field} message={err.message} type="error" showIcon closable className={styles.alertBox} />
           }) : null }
           <Form.Item className={styles.footer}>
-            <Button type="primary" htmlType="submit" className={styles.register_button} loading={isLoading}>
+            <Button type="primary" htmlType="submit" className={styles.login_button} loading={isLoading}>
               Login
             </Button>
             <p className={styles.footer_text}>Not a member yet? Click <Link href="/register"><a>here</a></Link> to register</p>
           </Form.Item>
         </Form>
       </Card>
-    </>
+    </div>
   );
 }
 
-export default Login
+export default withUrqlClient(createUrqlClient)(Login)
