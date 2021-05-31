@@ -4,8 +4,7 @@ import { UserOutlined, LockOutlined } from '@ant-design/icons';
 import { FormInstance } from 'antd/lib/form';
 import Link from 'next/link';
 import styles from "../styles/Login.module.scss"
-import { register } from '../src/types';
-import { useLoginMutation } from '../src/generated/graphql';
+import { Exact, useLoginMutation } from '../src/generated/graphql';
 import { useRouter } from 'next/router';
 import { withUrqlClient } from 'next-urql';
 import { createUrqlClient } from '../src/utils/createUrqlClient';
@@ -19,10 +18,10 @@ const Login: React.FC<{}> = ( { } ) => {
 
   const [, login] = useLoginMutation()
 
-  const onFinish = async ( values: register ) => {
+  const onFinish = async ( values: Exact<{ usernameOrEmail: string; password: string; }> ) => {
     setIsLoading(true)
     //console.log( 'Received values of form: ', values )
-    const response = await login({options: values})
+    const response = await login(values)
     if(response.data?.login.errors) {
       setServerError(response.data.login.errors)
     } else if (response.data?.login.user) {
@@ -46,8 +45,8 @@ const Login: React.FC<{}> = ( { } ) => {
         scrollToFirstError
         >
           <Form.Item
-            label="Username"
-            name="username"
+            label="Username/Email"
+            name="usernameOrEmail"
             rules={[
               {
                 required: true,
@@ -55,7 +54,7 @@ const Login: React.FC<{}> = ( { } ) => {
               }
             ]}
           >
-            <Input prefix={<UserOutlined className={styles.icon} />} placeholder="johndoe" />
+            <Input prefix={<UserOutlined className={styles.icon} />} placeholder="johndoe or john@example.com" />
           </Form.Item>
           <Form.Item
             label="Password"

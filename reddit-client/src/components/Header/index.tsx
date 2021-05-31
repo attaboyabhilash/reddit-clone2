@@ -18,7 +18,7 @@ const Header: React.FC<headerProps> = ({}) => {
     const [{ data, fetching }] = useMeQuery({
         pause: isServer()
     })
-    
+
     const logoutPageChange = () => {
         logout()
         router.push('/login')
@@ -52,7 +52,7 @@ const Header: React.FC<headerProps> = ({}) => {
                                     <Avatar style={{ backgroundColor: "#1890ff", verticalAlign: 'middle' }} size="large">
                                         {data.me.username[0].toUpperCase()}
                                     </Avatar>
-                                    {data.me.username}
+                                    <div className={styles.username}>{data.me.username}</div>
                                     <CaretDownOutlined />
                                 </div>
                             </Dropdown>

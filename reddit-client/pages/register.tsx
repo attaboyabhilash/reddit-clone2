@@ -1,11 +1,10 @@
 import React, { useRef, useState } from 'react'
 import { Form, Input, Button, Card, Alert } from 'antd';
-import { UserOutlined, LockOutlined } from '@ant-design/icons';
+import { UserOutlined, LockOutlined, MailOutlined } from '@ant-design/icons';
 import { FormInstance } from 'antd/lib/form';
 import Link from 'next/link';
 import styles from "../styles/Register.module.scss"
-import { register } from '../src/types';
-import { useRegisterMutation } from '../src/generated/graphql';
+import { Exact, useRegisterMutation, UsernamePasswordInput } from '../src/generated/graphql';
 import { useRouter } from 'next/router';
 import { withUrqlClient } from 'next-urql';
 import { createUrqlClient } from '../src/utils/createUrqlClient';
@@ -13,18 +12,18 @@ import { createUrqlClient } from '../src/utils/createUrqlClient';
 
 const Register: React.FC<{}> = ( { } ) => {
   const [isLoading, setIsLoading] = useState(false)
-  const [serverError, setServerError] = useState("")
+  const [serverError, setServerError] = useState([])
   const formRef = useRef<FormInstance>();
   const router = useRouter()
 
   const [, register] = useRegisterMutation()
 
-  const onFinish = async ( values: register ) => {
+  const onFinish = async ( values: any ) => {
     setIsLoading(true)
     //console.log( 'Received values of form: ', values )
-    const response = await register(values)
+    const response = await register({ options: values })
     if(response.data?.register.errors) {
-      setServerError(response.data.register.errors[0].message)
+      setServerError(response.data.register.errors)
     } else if (response.data?.register.user) {
       router.push("/")
     }
@@ -38,13 +37,29 @@ const Register: React.FC<{}> = ( { } ) => {
       <h1 className={styles.title}>Register</h1>
       <Card hoverable className={styles.register}>
         <Form
-        name="register"
-        className="register-form"
-        layout="vertical"
-        ref={formRef}
-        onFinish={onFinish}
-        scrollToFirstError
+          name="register"
+          className="register-form"
+          layout="vertical"
+          ref={formRef}
+          onFinish={onFinish}
+          scrollToFirstError
         >
+          <Form.Item
+            name="email"
+            label="Email"
+            rules={[
+              {
+                type: 'email',
+                message: 'The input is not valid E-mail!',
+              },
+              {
+                required: true,
+                message: 'Please input your Email!',
+              },
+            ]}
+          >
+            <Input prefix={<MailOutlined className={styles.icon} />} placeholder="john@example.com" />
+          </Form.Item>
           <Form.Item
             label="Username"
             name="username"
@@ -76,7 +91,7 @@ const Register: React.FC<{}> = ( { } ) => {
                   if (value.search(/[0-9]/) < 0) {
                       return Promise.reject(new Error("Password must contain at least one digit.")); 
                   }
-                  if (value.search(/[!@#$%^&*]/) < 0) {
+                  if (value.search(/[!#$%^&*]/) < 0) {
                     return Promise.reject(new Error("Password must contain at least one special character.")); 
                   }
                   if (value.length < 6) {
@@ -95,7 +110,10 @@ const Register: React.FC<{}> = ( { } ) => {
             />
           </Form.Item>
 
-          {serverError !== "" ? <Alert message={serverError} type="error" showIcon closable className={styles.alertBox} /> : null }
+          {serverError[0] !== "" ? serverError.map(err => {
+              return <Alert key={err.field} message={err.message} type="error" showIcon closable className={styles.alertBox} />
+          }) : null }
+
           <Form.Item className={styles.footer}>
             <Button type="primary" htmlType="submit" className={styles.register_button} loading={isLoading}>
               Register
