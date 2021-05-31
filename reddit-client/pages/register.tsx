@@ -4,7 +4,7 @@ import { UserOutlined, LockOutlined, MailOutlined } from '@ant-design/icons';
 import { FormInstance } from 'antd/lib/form';
 import Link from 'next/link';
 import styles from "../styles/Register.module.scss"
-import { Exact, useRegisterMutation, UsernamePasswordInput } from '../src/generated/graphql';
+import { useRegisterMutation } from '../src/generated/graphql';
 import { useRouter } from 'next/router';
 import { withUrqlClient } from 'next-urql';
 import { createUrqlClient } from '../src/utils/createUrqlClient';
@@ -37,8 +37,7 @@ const Register: React.FC<{}> = ( { } ) => {
       <h1 className={styles.title}>Register</h1>
       <Card hoverable className={styles.register}>
         <Form
-          name="register"
-          className="register-form"
+          name="register-form"
           layout="vertical"
           ref={formRef}
           onFinish={onFinish}
@@ -91,7 +90,7 @@ const Register: React.FC<{}> = ( { } ) => {
                   if (value.search(/[0-9]/) < 0) {
                       return Promise.reject(new Error("Password must contain at least one digit.")); 
                   }
-                  if (value.search(/[!#$%^&*]/) < 0) {
+                  if (value.search(/[!#@$%^&*]/) < 0) {
                     return Promise.reject(new Error("Password must contain at least one special character.")); 
                   }
                   if (value.length < 6) {

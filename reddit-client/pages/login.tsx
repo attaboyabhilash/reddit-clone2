@@ -37,12 +37,11 @@ const Login: React.FC<{}> = ( { } ) => {
       <h1 className={styles.title}>Login</h1>
       <Card hoverable className={styles.login}>
         <Form
-        name="login"
-        className="login-form"
-        layout="vertical"
-        ref={formRef}
-        onFinish={onFinish}
-        scrollToFirstError
+          name="login-form"
+          layout="vertical"
+          ref={formRef}
+          onFinish={onFinish}
+          scrollToFirstError
         >
           <Form.Item
             label="Username/Email"
