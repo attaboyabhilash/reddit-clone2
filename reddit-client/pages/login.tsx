@@ -1,5 +1,5 @@
 import React, { useRef, useState } from 'react'
-import { Form, Input, Button, Card, Alert } from 'antd';
+import { Form, Input, Button, Card, Alert, Checkbox } from 'antd';
 import { UserOutlined, LockOutlined } from '@ant-design/icons';
 import { FormInstance } from 'antd/lib/form';
 import Link from 'next/link';
@@ -49,7 +49,7 @@ const Login: React.FC<{}> = ( { } ) => {
             rules={[
               {
                 required: true,
-                message: 'Please input your Username!',
+                message: 'Please input your Username/Email!',
               }
             ]}
           >
@@ -75,6 +75,19 @@ const Login: React.FC<{}> = ( { } ) => {
           {serverError[0] !== "" ? serverError.map(err => {
               return <Alert key={err.field} message={err.message} type="error" showIcon closable className={styles.alertBox} />
           }) : null }
+
+          <Form.Item>
+            <Form.Item name="remember" valuePropName="checked" noStyle>
+              <Checkbox>Remember me</Checkbox>
+            </Form.Item>
+
+            <Link href="/forgot_password">
+              <a className={styles.remember}>
+                Forgot password
+              </a>
+            </Link>
+          </Form.Item>
+
           <Form.Item className={styles.footer}>
             <Button type="primary" htmlType="submit" className={styles.login_button} loading={isLoading}>
               Login
