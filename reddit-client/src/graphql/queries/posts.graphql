@@ -2,6 +2,7 @@ query Posts {
    posts {
       _id
       title
+      text
       createdAt
       updatedAt
    }

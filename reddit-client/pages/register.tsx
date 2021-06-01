@@ -8,6 +8,7 @@ import { useRegisterMutation } from '../src/generated/graphql';
 import { useRouter } from 'next/router';
 import { withUrqlClient } from 'next-urql';
 import { createUrqlClient } from '../src/utils/createUrqlClient';
+import Layout from "../src/components/Layout"
 
 
 const Register: React.FC<{}> = ( { } ) => {
@@ -33,6 +34,7 @@ const Register: React.FC<{}> = ( { } ) => {
 
 
   return (
+    <Layout>
     <div className={styles.container}>
       <h1 className={styles.title}>Register</h1>
       <Card hoverable className={styles.register}>
@@ -122,6 +124,7 @@ const Register: React.FC<{}> = ( { } ) => {
         </Form>
       </Card>
     </div>
+    </Layout>
   );
 }
 

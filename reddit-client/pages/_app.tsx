@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from "react"
 import { useRouter } from "next/router"
-import Layout from "../src/components/Layout"
 import { Spin } from "antd"
 import "../styles/globals.scss"
 

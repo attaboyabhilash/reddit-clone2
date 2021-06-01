@@ -7,6 +7,8 @@ import { Exact, useForgotPasswordMutation } from '../src/generated/graphql';
 import { useRouter } from 'next/router';
 import { withUrqlClient } from 'next-urql';
 import { createUrqlClient } from '../src/utils/createUrqlClient';
+import Layout from "../src/components/Layout"
+
 
 const ForgotPassword: React.FC<{}> = ({}) => {
         const [isLoading, setIsLoading] = useState(false)
@@ -27,6 +29,7 @@ const ForgotPassword: React.FC<{}> = ({}) => {
 
 
         return (
+            <Layout>
             <div className={styles.container}>
                 <h1 className={styles.title}>Forgot Password?</h1>
                 {
@@ -79,6 +82,7 @@ const ForgotPassword: React.FC<{}> = ({}) => {
                         </Card>
                 }
             </div>
+            </Layout>
         );
 }
 

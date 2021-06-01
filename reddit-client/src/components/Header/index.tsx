@@ -29,7 +29,7 @@ const Header: React.FC<headerProps> = ({}) => {
                 Your Profile
             </Menu.Item>
             <Menu.Item>
-                Your Settings
+                <Link href="/create_post"><a>Create New Post</a></Link>
             </Menu.Item>
             <Menu.Item>
                 <Button loading={logoutFetching} type="primary" size="small" danger onClick={() => logoutPageChange()}>Logout</Button>
