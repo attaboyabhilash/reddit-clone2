@@ -1,13 +1,16 @@
 import { useState } from "react"
 import { usePostsQuery } from '../src/generated/graphql'
-import { Card, Spin, Button } from "antd"
+import { Card, Spin, Button, Tooltip } from "antd"
 import styles from '../styles/Home.module.scss'
 import { withUrqlClient } from 'next-urql';
 import { createUrqlClient } from '../src/utils/createUrqlClient';
 import Layout from '../src/components/Layout';
+import dayjs from "dayjs"
+import relativeTime from "dayjs/plugin/relativeTime"
+import { ArrowUpOutlined, ArrowDownOutlined } from '@ant-design/icons';
 
 const index = () => {
-  const { Meta } = Card;
+  dayjs.extend(relativeTime)
   const [variables, setVariables] = useState({limit: 10, cursor: null as null | string})
   const [{data, fetching}] = usePostsQuery({
     variables: variables
@@ -25,39 +28,59 @@ const index = () => {
               <div className={styles.spinner}>
                 <Spin size="large" />              
               </div> 
-            : data.posts.map(post => {
+            : data.posts.posts.map(post => {
               return (
                     <Card 
                       className={styles.card}
                       key={post._id} 
                       style={{width: "300px"}}
                       actions={[
-                        <span className={styles.action}>{`Published - ${new Date(post.createdAt).toLocaleDateString()}`}</span>
+                        <ArrowUpOutlined />,
+                        0,
+                        <ArrowDownOutlined />
                       ]}
                       hoverable
                     >
-                      <Meta
-                        title={post.title}
-                        description={post.textSnippet + "..."}
-                      />
+                      {
+                        post.title.length > 27 ?
+                          <Tooltip title={post.title} placement="right" color={"#001529"}>
+                            <h3>{post.title.slice(0, 27.5) + "..."}</h3>
+                          </Tooltip>
+                          :
+                          <h3>{post.title}</h3>
+                      }
+                      <div className={styles.meta_data}>
+                        <div className={styles.raw}>
+                          <small>{post.creator.username}</small>
+                          <span></span>
+                          <small>{dayjs(new Date(parseInt(post.createdAt)).toLocaleDateString()).fromNow()}</small>
+                        </div>
+                        <p className={styles.description}>
+                          {post.textSnippet + " ..."}
+                        </p>
+                      </div>
+                      
                     </Card>
               )
             })}
           </div>
-          {data ? (
-            <div className={styles.footer}>
-              <div></div>
-              <Button className={styles.read_more} onClick={() => setVariables({
-                limit: variables.limit, 
-                cursor: data.posts[data.posts.length - 1].createdAt 
-              })}>
-                Load More
-              </Button>
-            </div>
-          ) : null}
+          <div className={styles.footer}>
+            {data && data.posts.posts.length > 0 && data.posts.hasMore ? (
+              <div className={styles.flexer}>
+                <div></div>
+                <Button className={styles.read_more} onClick={() => setVariables({
+                  limit: variables.limit, 
+                  cursor: data.posts.posts[data.posts.posts.length - 1].createdAt 
+                })}>
+                  Load More
+                </Button>
+              </div>
+            ) : <p className={styles.footer_para}>--No More Posts to show--</p>}
+          </div>
         </div>
       </Layout>
   )
 }
 
 export default withUrqlClient(createUrqlClient, {ssr: true})(index)
+

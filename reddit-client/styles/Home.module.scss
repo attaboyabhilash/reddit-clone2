@@ -20,6 +20,36 @@
       .card {
          height: fit-content !important;
          margin: 20px auto;
+
+         h3 {
+            margin-bottom: 3px;
+         }
+
+         .meta_data {
+            .raw {
+               display: flex;
+               align-items: center;
+               small {
+                  margin-right: 5px;
+               }
+               small:hover {
+                  color: #1890ff;
+               }
+               span {
+                  width: 4px;
+                  height: 4px;
+                  border-radius: 50%;
+                  background-color: #666;
+                  margin-right: 5px;
+               }
+            }
+
+            .description {
+               margin-top: 15px;
+               margin-bottom: 0px;
+               color: rgba(0, 0, 0, 0.45);
+            }
+         }
       }
 
       .action {
@@ -28,13 +58,20 @@
    }
 
    .footer {
-      display: flex;
       padding-bottom: 75px;
       margin: 20px auto;
-      justify-content: space-between;
-      .read_more:hover {
-         background-color: #1890ff;
-         color: #fff;
+      .flexer {
+         display: flex;
+         justify-content: space-between;
+         .read_more:hover {
+            background-color: #1890ff;
+            color: #fff;
+         }
+      }
+      .footer_para {
+         width: fit-content;
+         text-align: center;
+         margin: 30px auto;
       }
    }
 }

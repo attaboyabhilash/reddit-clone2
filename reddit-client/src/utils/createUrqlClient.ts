@@ -61,6 +61,9 @@ export const createUrqlClient = (ssrExchange: any) => ({
         credentials: 'include' as const
     },
     exchanges: [dedupExchange, cacheExchange({
+        keys: {
+            PaginatedPosts: () => null
+        },
         resolvers: {
             Query: {
                 posts: cursorPagination()

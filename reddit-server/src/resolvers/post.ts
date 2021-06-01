@@ -31,7 +31,6 @@ export class PostResolvers {
         return root.text.slice(0, 60)
     }
 
-
     @Query( () => PaginatedPosts) 
     async posts(
         @Arg('limit', () => Int) limit: number,
@@ -39,16 +38,26 @@ export class PostResolvers {
     ): Promise<PaginatedPosts> {
         const realLimit = Math.min(50, limit)
         const realLimitPlusOne = realLimit + 1
-        const qb = getConnection()
-                    .getRepository(Post)
-                    .createQueryBuilder("post")
-                    .orderBy('"createdAt"', 'DESC')
-                    .take(realLimitPlusOne)
-        if(cursor) {
-            qb.where('"createdAt" < :cursor', { cursor: new Date(parseInt(cursor)) })
-        }
 
-        const posts = await qb.getMany()
+        const replacements: any[] = [realLimitPlusOne]
+
+        if(cursor) {
+            replacements.push(new Date(parseInt(cursor)))
+        }
+        
+        const posts = await getConnection().query(`
+            select p.* ,
+            json_build_object(
+                '_id', u._id,
+                'username', u.username,
+                'email', u.email
+            ) creator
+            from post p
+            inner join public.user u on u._id = p."creatorId"
+            ${cursor ? `where p."createdAt" < $2` : ''}
+            order by p."createdAt" DESC
+            limit $1
+        `, replacements)
 
         return { posts: posts.slice(0, realLimit), hasMore: posts.length === realLimitPlusOne }
     }
