@@ -1,4 +1,40 @@
-.container2 {
+.container {
    width: 80%;
-   margin: 50px auto;
+   margin: 100px auto;
+
+   .spinner {
+      height: 60vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+   }
+
+   .posts {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(10em, 27em));
+      margin: auto;
+      margin-bottom: 0px;
+      padding-bottom: 50px;
+      justify-content: center;
+
+      .card {
+         height: fit-content !important;
+         margin: 20px auto;
+      }
+
+      .action {
+         color: #1890ff;
+      }
+   }
+
+   .footer {
+      display: flex;
+      padding-bottom: 75px;
+      margin: 20px auto;
+      justify-content: space-between;
+      .read_more:hover {
+         background-color: #1890ff;
+         color: #fff;
+      }
+   }
 }

@@ -10,7 +10,7 @@ import { createUrqlClient } from "../../src/utils/createUrqlClient";
 import { withUrqlClient } from "next-urql";
 
 
-const ChangePassword: NextPage<{token: string}> = ({token}) => {
+const ChangePassword: NextPage = () => {
     const [isLoading, setIsLoading] = useState(false)
     const [serverError, setServerError] = useState([])
     const router = useRouter()
@@ -20,7 +20,9 @@ const ChangePassword: NextPage<{token: string}> = ({token}) => {
     const onFinish = async ( values: any ) => {
         setIsLoading(true)
         //console.log( 'Received values of form: ', values.newPassword )
-        const response = await changePassword({ newPassword: values.newPassword, token: token })
+        const response = await changePassword({ 
+            newPassword: values.newPassword, 
+            token: typeof router.query.token === 'string' ?  router.query.token : "" })
         if(response.data?.changePassword.errors) {
             setServerError(response.data.changePassword.errors)
         } else if (response.data?.changePassword.user) {
@@ -105,10 +107,4 @@ const ChangePassword: NextPage<{token: string}> = ({token}) => {
         );
 }
 
-ChangePassword.getInitialProps = ({query}) => {
-    return {
-        token: query.token as string
-    }
-}
-
-export default withUrqlClient(createUrqlClient)(ChangePassword as any)
+export default withUrqlClient(createUrqlClient)(ChangePassword)

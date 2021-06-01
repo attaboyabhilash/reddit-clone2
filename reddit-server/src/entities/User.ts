@@ -25,11 +25,11 @@ export class User extends BaseEntity {
   @OneToMany(() => Post, post => post.creator)
   posts: Post[]
 
-  @Field()
+  @Field(() => String)
   @CreateDateColumn()
   createdAt: Date;
 
-  @Field()
+  @Field(() => String)
   @UpdateDateColumn()
   updatedAt: Date;
 
