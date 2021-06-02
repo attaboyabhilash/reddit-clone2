@@ -118,14 +118,14 @@ export class PostResolvers {
         return { posts: posts.slice(0, realLimit), hasMore: posts.length === realLimitPlusOne }
     }
 
-    @Query( () => Post, { nullable: true }) 
+    @Query(() => Post, { nullable: true }) 
     post( 
-        @Arg('_id') _id: number
+        @Arg('_id', () => Int) _id: number
     ): Promise<Post | undefined> {
-        return Post.findOne(_id)
+        return Post.findOne(_id, {relations: ['creator']})
     }
 
-    @Mutation( () => Post)
+    @Mutation(() => Post)
     @UseMiddleware(isAuth) 
     async createPost( 
         @Arg('input') input: PostInput,
@@ -138,28 +138,39 @@ export class PostResolvers {
     }
 
     @Mutation( () => Post, { nullable: true }) 
+    @UseMiddleware(isAuth)
     async updatePost( 
-        @Arg('_id') _id: number,
-        @Arg('title') title: string
+        @Arg('_id', () => Int) _id: number,
+        @Arg('title') title: string,
+        @Arg('text') text: string,
+        @Ctx() {req}: MyContext 
     ): Promise<Post | null> {
-        const post = await Post.findOne(_id)
-        if(!post) {
-            return null
-        }
-        if(typeof title !== undefined) {
-            await Post.update({_id}, {title})
-        }
-        return post
+        const { userId } = req.session
+        
+        const post = await getConnection()
+                            .createQueryBuilder()
+                            .update(Post)
+                            .set({title, text})
+                            .where('_id = :_id and "creatorId" = :creatorId', {_id, creatorId: userId})
+                            .returning('*')
+                            .execute()
+        
+        return post.raw[0]
     }
 
-    @Mutation( () => Boolean) 
+    @Mutation(() => Boolean) 
+    @UseMiddleware(isAuth)
     async deletePost( 
-        @Arg('_id') _id: number
+        @Arg('_id', () => Int) _id: number,
+        @Ctx() {req}: MyContext 
     ): Promise<boolean> {
-        const post = await Post.delete(_id)
+        const { userId } = req.session
+        const post = await Post.delete({ _id, creatorId: userId })
+        
         if(!post) {
             return false
         }
+
         return true
     }
 }

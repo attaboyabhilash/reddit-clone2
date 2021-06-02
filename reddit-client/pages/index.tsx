@@ -26,11 +26,8 @@ const index = () => {
               <div className={styles.spinner}>
                 <Spin size="large" />              
               </div> 
-            : data.posts.posts.map(post => {
-              return (
-                    <RedditCard key={post._id} post={post} />
-              )
-            })}
+            : data.posts.posts.map(post => !post ? null : <RedditCard key={post._id} post={post} />)
+            }
           </div>
           <div className={styles.footer}>
             {data && data.posts.posts.length > 0 && data.posts.hasMore ? (

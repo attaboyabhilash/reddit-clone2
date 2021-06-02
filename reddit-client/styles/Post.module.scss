@@ -1,0 +1,57 @@
+.spinner {
+   display: flex;
+   justify-content: center;
+   align-items: center;
+   height: 100vh;
+
+   .no_data {
+      color: #aaa;
+   }
+}
+
+.container {
+   min-height: 80vh;
+   padding-top: 100px;
+
+   .card {
+      width: 70%;
+      margin: 30px auto;
+
+      .flexer {
+         margin-bottom: 10px;
+         display: flex;
+         justify-content: space-between;
+         align-items: center;
+         h2 {
+            margin: 0px;
+         }
+      }
+
+      .footer {
+         text-align: center;
+      }
+
+      .create_button {
+         width: 200px;
+         margin: 20px auto 0px auto;
+      }
+
+      .edit_btn {
+         border-color: #666 !important;
+         transition: all 250ms ease-in-out;
+         span {
+            color: #666 !important;
+         }
+      }
+
+      .edit_btn:hover {
+         border-color: #ff4d4f !important;
+         span {
+            color: #ff4d4f !important;
+            svg {
+               color: #ff4d4f !important;
+            }
+         }
+      }
+   }
+}

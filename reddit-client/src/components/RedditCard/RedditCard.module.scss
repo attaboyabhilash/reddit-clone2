@@ -4,6 +4,11 @@
 
    h3 {
       margin-bottom: 3px;
+      transition: all 250ms ease-in-out;
+   }
+
+   h3:hover {
+      color: #1890ff;
    }
 
    .meta_data {
@@ -12,9 +17,6 @@
          align-items: center;
          small {
             margin-right: 5px;
-         }
-         small:hover {
-            color: #1890ff;
          }
          span {
             width: 4px;
@@ -29,6 +31,29 @@
          margin-top: 15px;
          margin-bottom: 0px;
          color: rgba(0, 0, 0, 0.45);
+      }
+   }
+
+   .upVote,
+   .downVote {
+      border-color: #666;
+   }
+
+   .upVote:hover {
+      border-color: #27ae60;
+      span {
+         svg {
+            color: #27ae60;
+         }
+      }
+   }
+
+   .downVote:hover {
+      border-color: #c0392b;
+      span {
+         svg {
+            color: #c0392b;
+         }
       }
    }
 }

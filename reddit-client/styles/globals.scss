@@ -22,27 +22,17 @@ a {
 }
 
 .ant-card-actions {
-   li:first-child:hover {
-      span {
-         svg {
-            color: #27ae60;
-         }
-      }
-   }
    li:nth-child(2) {
       color: #000;
       font-weight: 400;
+      margin-top: 16px;
+      span {
+         font-size: 1.1em;
+      }
    }
    li:nth-child(2):hover {
       span {
          color: #000 !important;
-      }
-   }
-   li:last-child:hover {
-      span {
-         svg {
-            color: #c0392b;
-         }
       }
    }
 }

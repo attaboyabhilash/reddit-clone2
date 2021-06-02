@@ -46,13 +46,14 @@ export type MutationCreatePostArgs = {
 
 
 export type MutationUpdatePostArgs = {
+  text: Scalars['String'];
   title: Scalars['String'];
-  _id: Scalars['Float'];
+  _id: Scalars['Int'];
 };
 
 
 export type MutationDeletePostArgs = {
-  _id: Scalars['Float'];
+  _id: Scalars['Int'];
 };
 
 
@@ -117,7 +118,7 @@ export type QueryPostsArgs = {
 
 
 export type QueryPostArgs = {
-  _id: Scalars['Float'];
+  _id: Scalars['Int'];
 };
 
 export type User = {
@@ -189,6 +190,16 @@ export type CreatePostMutation = (
   ) }
 );
 
+export type DeletePostMutationVariables = Exact<{
+  _id: Scalars['Int'];
+}>;
+
+
+export type DeletePostMutation = (
+  { __typename?: 'Mutation' }
+  & Pick<Mutation, 'deletePost'>
+);
+
 export type ForgotPasswordMutationVariables = Exact<{
   email: Scalars['String'];
 }>;
@@ -245,6 +256,21 @@ export type UpVoteMutation = (
   & Pick<Mutation, 'vote'>
 );
 
+export type UpdatePostMutationVariables = Exact<{
+  _id: Scalars['Int'];
+  title: Scalars['String'];
+  text: Scalars['String'];
+}>;
+
+
+export type UpdatePostMutation = (
+  { __typename?: 'Mutation' }
+  & { updatePost?: Maybe<(
+    { __typename?: 'Post' }
+    & Pick<Post, '_id' | 'title' | 'text' | 'textSnippet'>
+  )> }
+);
+
 export type MeQueryVariables = Exact<{ [key: string]: never; }>;
 
 
@@ -253,6 +279,19 @@ export type MeQuery = (
   & { me?: Maybe<(
     { __typename?: 'User' }
     & RegularUserFragment
+  )> }
+);
+
+export type PostQueryVariables = Exact<{
+  _id: Scalars['Int'];
+}>;
+
+
+export type PostQuery = (
+  { __typename?: 'Query' }
+  & { post?: Maybe<(
+    { __typename?: 'Post' }
+    & Pick<Post, '_id' | 'title' | 'text' | 'createdAt' | 'updatedAt'>
   )> }
 );
 
@@ -327,6 +366,15 @@ export const CreatePostDocument = gql`
 export function useCreatePostMutation() {
   return Urql.useMutation<CreatePostMutation, CreatePostMutationVariables>(CreatePostDocument);
 };
+export const DeletePostDocument = gql`
+    mutation DeletePost($_id: Int!) {
+  deletePost(_id: $_id)
+}
+    `;
+
+export function useDeletePostMutation() {
+  return Urql.useMutation<DeletePostMutation, DeletePostMutationVariables>(DeletePostDocument);
+};
 export const ForgotPasswordDocument = gql`
     mutation ForgotPassword($email: String!) {
   forgotPassword(email: $email)
@@ -376,6 +424,20 @@ export const UpVoteDocument = gql`
 export function useUpVoteMutation() {
   return Urql.useMutation<UpVoteMutation, UpVoteMutationVariables>(UpVoteDocument);
 };
+export const UpdatePostDocument = gql`
+    mutation UpdatePost($_id: Int!, $title: String!, $text: String!) {
+  updatePost(_id: $_id, title: $title, text: $text) {
+    _id
+    title
+    text
+    textSnippet
+  }
+}
+    `;
+
+export function useUpdatePostMutation() {
+  return Urql.useMutation<UpdatePostMutation, UpdatePostMutationVariables>(UpdatePostDocument);
+};
 export const MeDocument = gql`
     query Me {
   me {
@@ -386,6 +448,21 @@ export const MeDocument = gql`
 
 export function useMeQuery(options: Omit<Urql.UseQueryArgs<MeQueryVariables>, 'query'> = {}) {
   return Urql.useQuery<MeQuery>({ query: MeDocument, ...options });
+};
+export const PostDocument = gql`
+    query Post($_id: Int!) {
+  post(_id: $_id) {
+    _id
+    title
+    text
+    createdAt
+    updatedAt
+  }
+}
+    `;
+
+export function usePostQuery(options: Omit<Urql.UseQueryArgs<PostQueryVariables>, 'query'> = {}) {
+  return Urql.useQuery<PostQuery>({ query: PostDocument, ...options });
 };
 export const PostsDocument = gql`
     query Posts($limit: Int!, $cursor: String) {

@@ -1,4 +1,5 @@
-import { Card, Tooltip } from "antd"
+import { Card, Tooltip, Button } from "antd"
+import Link from "next/link"
 import styles from "./RedditCard.module.scss"
 import { ArrowUpOutlined, ArrowDownOutlined } from '@ant-design/icons';
 import { useUpVoteMutation, PostsQuery } from "../../generated/graphql"
@@ -17,24 +18,28 @@ const RedditCard: React.FC<Post> = ({ post }) => {
                 className={styles.card}
                     style={{width: "300px"}}
                     actions={[
-                        <ArrowUpOutlined 
-                          style={post.voteStatus === 1 ? {color: "#27ae60"}: {}} 
+                        <Button 
+                          className={styles.upVote} 
+                          style={post.voteStatus === 1 ? {borderColor: "#27ae60"}: {}}
+                          icon={<ArrowUpOutlined style={post.voteStatus === 1 ? {color: "#27ae60"}: {}} />} 
                           onClick={() => {
                             if(post.voteStatus === 1) {
                               return
                             }
                             vote({ value: 1, postId: post._id })
-                          }} 
+                          }}
                         />,
                         post.points,
-                        <ArrowDownOutlined 
-                          style={post.voteStatus === -1 ? {color: "#c0392b"} : {}} 
+                        <Button 
+                          className={styles.downVote}
+                          style={post.voteStatus === -1 ? {borderColor: "#c0392b"} : {}}
+                          icon={<ArrowDownOutlined style={post.voteStatus === -1 ? {color: "#c0392b"} : {}} />}
                           onClick={() => {
                             if(post.voteStatus === -1) {
                               return
                             }
                             vote({ value: -1, postId: post._id })
-                          }} 
+                          }}
                         /> 
                     ]}
                     hoverable
@@ -42,10 +47,10 @@ const RedditCard: React.FC<Post> = ({ post }) => {
                     {
                       post.title.length > 27 ?
                         <Tooltip title={post.title} placement="right" color={"#001529"}>
-                          <h3>{post.title.slice(0, 27.5) + "..."}</h3>
+                          <Link href="/post/[id]" as={`/post/${post._id}`}><a><h3>{post.title.slice(0, 27.5) + "..."}</h3></a></Link>
                         </Tooltip>
                         :
-                        <h3>{post.title}</h3>
+                        <Link href="/post/[id]" as={`/post/${post._id}`}><a><h3>{post.title}</h3></a></Link>
                     }
                     <div className={styles.meta_data}>
                       <div className={styles.raw}>
