@@ -17,9 +17,25 @@ const RedditCard: React.FC<Post> = ({ post }) => {
                 className={styles.card}
                     style={{width: "300px"}}
                     actions={[
-                        <ArrowUpOutlined onClick={() => vote({ value: 1, postId: post._id })} />,
+                        <ArrowUpOutlined 
+                          style={post.voteStatus === 1 ? {color: "#27ae60"}: {}} 
+                          onClick={() => {
+                            if(post.voteStatus === 1) {
+                              return
+                            }
+                            vote({ value: 1, postId: post._id })
+                          }} 
+                        />,
                         post.points,
-                        <ArrowDownOutlined onClick={() => vote({ value: -1, postId: post._id })} /> 
+                        <ArrowDownOutlined 
+                          style={post.voteStatus === -1 ? {color: "#c0392b"} : {}} 
+                          onClick={() => {
+                            if(post.voteStatus === -1) {
+                              return
+                            }
+                            vote({ value: -1, postId: post._id })
+                          }} 
+                        /> 
                     ]}
                     hoverable
                 >
@@ -35,7 +51,7 @@ const RedditCard: React.FC<Post> = ({ post }) => {
                       <div className={styles.raw}>
                         <small>{post.creator.username}</small>
                         <span></span>
-                        <small>{dayjs(new Date(parseInt(post.createdAt)).toLocaleDateString()).fromNow()}</small>
+                        <small>{dayjs(new Date(parseInt(post.createdAt))).fromNow()}</small>
                       </div>
                       <p className={styles.description}>
                         {post.textSnippet + " ..."}

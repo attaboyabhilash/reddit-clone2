@@ -3,7 +3,7 @@ import { Arg, Ctx, Field, FieldResolver, InputType, Int, Mutation, ObjectType, Q
 import { MyContext } from "../types";
 import isAuth from "../middleware/isAuth";
 import { getConnection } from "typeorm";
-import { UpVote } from "src/entities/UpVote";
+import { UpVote } from "../entities/UpVote";
 
 @InputType()
 class PostInput {
@@ -42,33 +42,62 @@ export class PostResolvers {
         const newValue = isUpvote ? 1 : -1
         const { userId } = req.session
 
-        await getConnection().query(`
-            START TRANSACTION;
+        const vote = await UpVote.findOne({where: {postId, userId}})
 
-            insert into "up_vote" ("userId", "postId", value)
-            values (${userId}, ${postId}, ${newValue});
-            
-            update post
-            set points = points + ${newValue}
-            where _id = ${postId};
-            
-            COMMIT;
-        `)
+        if(vote && vote.value !== newValue) {
+            await getConnection().transaction(async tm => {
+                await tm.query(`
+                    update "up_vote"
+                    set value = $1
+                    where "postId" = $2 and "userId" = $3
+                `, [newValue, postId, userId])
+
+                await tm.query(`
+                    update post
+                    set points = points + $1
+                    where _id = $2;
+                `, [2 * newValue, postId])
+            })
+        } else if (!vote) {
+            await getConnection().transaction(async tm => {
+                await tm.query(`
+                    insert into "up_vote" ("userId", "postId", value)
+                    values ($1, $2, $3);
+                `, [userId, postId, newValue])
+
+                await tm.query(`
+                    update post
+                    set points = points + $1
+                    where _id = $2;
+                `, [newValue, postId])
+            })
+        }
+
         return true
     }
 
     @Query( () => PaginatedPosts) 
     async posts(
         @Arg('limit', () => Int) limit: number,
-        @Arg('cursor', () => String, { nullable: true }) cursor: string | null
+        @Arg('cursor', () => String, { nullable: true }) cursor: string | null,
+        @Ctx() {req}: MyContext
     ): Promise<PaginatedPosts> {
+
+        const { userId } = req.session
         const realLimit = Math.min(50, limit)
         const realLimitPlusOne = realLimit + 1
 
         const replacements: any[] = [realLimitPlusOne]
 
+        if(userId) {
+            replacements.push(userId)
+        }
+        
+        let cursorIndex = 3
+
         if(cursor) {
             replacements.push(new Date(parseInt(cursor)))
+            cursorIndex = replacements.length
         }
         
         const posts = await getConnection().query(`
@@ -78,9 +107,10 @@ export class PostResolvers {
                 'username', u.username,
                 'email', u.email
             ) creator
+            ${userId ? ',(select value from "up_vote" where "userId" = $2 and "postId" = p._id) "voteStatus"' : 'null as "voteStatus"'}
             from post p
             inner join public.user u on u._id = p."creatorId"
-            ${cursor ? `where p."createdAt" < $2` : ''}
+            ${cursor ? `where p."createdAt" < $${cursorIndex}` : ''}
             order by p."createdAt" DESC
             limit $1
         `, replacements)

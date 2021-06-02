@@ -89,6 +89,7 @@ export type Post = {
   title: Scalars['String'];
   text: Scalars['String'];
   points: Scalars['Float'];
+  voteStatus?: Maybe<Scalars['Int']>;
   creatorId: Scalars['Float'];
   creator: User;
   createdAt: Scalars['String'];
@@ -268,7 +269,7 @@ export type PostsQuery = (
     & Pick<PaginatedPosts, 'hasMore'>
     & { posts: Array<(
       { __typename?: 'Post' }
-      & Pick<Post, '_id' | 'title' | 'textSnippet' | 'points' | 'createdAt' | 'updatedAt'>
+      & Pick<Post, '_id' | 'title' | 'textSnippet' | 'points' | 'voteStatus' | 'createdAt' | 'updatedAt'>
       & { creator: (
         { __typename?: 'User' }
         & Pick<User, '_id' | 'username'>
@@ -395,6 +396,7 @@ export const PostsDocument = gql`
       title
       textSnippet
       points
+      voteStatus
       createdAt
       updatedAt
       creator {
