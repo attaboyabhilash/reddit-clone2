@@ -10,6 +10,8 @@
 /reddit-server/build
 /reddit-server/node_modules
 /reddit-server/dist
+/reddit-server/.env
+/reddit-server/.env.example
 
 #extra
 

@@ -34,13 +34,7 @@
       }
    }
 
-   .upVote,
-   .downVote {
-      border-color: #666;
-   }
-
    .upVote:hover {
-      border-color: #27ae60;
       span {
          svg {
             color: #27ae60;
@@ -49,7 +43,6 @@
    }
 
    .downVote:hover {
-      border-color: #c0392b;
       span {
          svg {
             color: #c0392b;

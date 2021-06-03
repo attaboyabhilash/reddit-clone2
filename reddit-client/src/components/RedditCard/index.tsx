@@ -18,37 +18,39 @@ const RedditCard: React.FC<Post> = ({ post }) => {
                 className={styles.card}
                     style={{width: "300px"}}
                     actions={[
-                        <Button 
-                          className={styles.upVote} 
-                          style={post.voteStatus === 1 ? {borderColor: "#27ae60"}: {}}
-                          icon={<ArrowUpOutlined style={post.voteStatus === 1 ? {color: "#27ae60"}: {}} />} 
-                          onClick={() => {
-                            if(post.voteStatus === 1) {
-                              return
-                            }
-                            vote({ value: 1, postId: post._id })
+                        <div className={styles.upVote} 
+                            onClick={() => {
+                              if(post.voteStatus === 1) {
+                                return
+                              }
+                              vote({ value: 1, postId: post._id })
                           }}
-                        />,
+                        >
+                          <ArrowUpOutlined style={post.voteStatus === 1 ? {color: "#27ae60"}: {}} />  
+                        </div>,
                         post.points,
-                        <Button 
-                          className={styles.downVote}
-                          style={post.voteStatus === -1 ? {borderColor: "#c0392b"} : {}}
-                          icon={<ArrowDownOutlined style={post.voteStatus === -1 ? {color: "#c0392b"} : {}} />}
-                          onClick={() => {
-                            if(post.voteStatus === -1) {
-                              return
-                            }
-                            vote({ value: -1, postId: post._id })
-                          }}
-                        /> 
+                        <div className={styles.downVote}
+                            onClick={() => {
+                              if(post.voteStatus === -1) {
+                                return
+                              }
+                              vote({ value: -1, postId: post._id })
+                            }}
+                        >
+                          <ArrowDownOutlined style={post.voteStatus === -1 ? {color: "#c0392b"} : {}} />
+                        </div>
                     ]}
                     hoverable
                 >
                     {
                       post.title.length > 27 ?
-                        <Tooltip title={post.title} placement="right" color={"#001529"}>
-                          <Link href="/post/[id]" as={`/post/${post._id}`}><a><h3>{post.title.slice(0, 27.5) + "..."}</h3></a></Link>
-                        </Tooltip>
+                        <Link href="/post/[id]" as={`/post/${post._id}`}>
+                          <a>
+                            <Tooltip title={post.title} placement="right" color={"#001529"}>
+                              <h3>{post.title.slice(0, 27.5) + "..."}</h3>
+                            </Tooltip>
+                          </a>
+                        </Link>
                         :
                         <Link href="/post/[id]" as={`/post/${post._id}`}><a><h3>{post.title}</h3></a></Link>
                     }
