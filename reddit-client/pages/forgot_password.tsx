@@ -5,8 +5,6 @@ import { FormInstance } from 'antd/lib/form';
 import styles from "../styles/Login.module.scss"
 import { Exact, useForgotPasswordMutation } from '../src/generated/graphql';
 import { useRouter } from 'next/router';
-import { withUrqlClient } from 'next-urql';
-import { createUrqlClient } from '../src/utils/createUrqlClient';
 import Layout from "../src/components/Layout"
 
 
@@ -17,12 +15,12 @@ const ForgotPassword: React.FC<{}> = ({}) => {
         const formRef = useRef<FormInstance>();
         const router = useRouter()
 
-        const [, forgotPassword] = useForgotPasswordMutation()
+        const [forgotPassword] = useForgotPasswordMutation()
 
         const onFinish = async ( values: Exact<{ email: string; }> ) => {
             setIsLoading(true)
             setEmail(values.email)
-            await forgotPassword(values)
+            await forgotPassword({variables: {email: values.email}})
             setIsCompleted(true)
             setIsLoading(false)
         };
@@ -86,4 +84,4 @@ const ForgotPassword: React.FC<{}> = ({}) => {
         );
 }
 
-export default withUrqlClient(createUrqlClient)(ForgotPassword)
+export default ForgotPassword

@@ -6,8 +6,6 @@ import { useRouter } from 'next/router';
 import { LockOutlined } from '@ant-design/icons';
 import styles from "../../styles/ChangePassword.module.scss"
 import { useChangePasswordMutation } from "../../src/generated/graphql";
-import { createUrqlClient } from "../../src/utils/createUrqlClient";
-import { withUrqlClient } from "next-urql";
 
 
 const ChangePassword: NextPage = () => {
@@ -15,14 +13,15 @@ const ChangePassword: NextPage = () => {
     const [serverError, setServerError] = useState([])
     const router = useRouter()
     const formRef = useRef<FormInstance>();
-    const [, changePassword] = useChangePasswordMutation()
+    const [changePassword] = useChangePasswordMutation()
 
     const onFinish = async ( values: any ) => {
         setIsLoading(true)
         //console.log( 'Received values of form: ', values.newPassword )
-        const response = await changePassword({ 
+        const response = await changePassword({ variables: { 
             newPassword: values.newPassword, 
-            token: typeof router.query.token === 'string' ?  router.query.token : "" })
+            token: typeof router.query.token === 'string' ?  router.query.token : "" } 
+        })
         if(response.data?.changePassword.errors) {
             setServerError(response.data.changePassword.errors)
         } else if (response.data?.changePassword.user) {
@@ -107,4 +106,4 @@ const ChangePassword: NextPage = () => {
         );
 }
 
-export default withUrqlClient(createUrqlClient)(ChangePassword)
+export default ChangePassword

@@ -5,8 +5,6 @@ import styles from "../../../styles/Post.module.scss"
 import { Card, Form, Input, Button, Spin, Empty, message } from "antd"
 import { FormInstance } from 'antd/lib/form';
 import Layout from "../../../src/components/Layout"
-import { createUrqlClient } from "../../../src/utils/createUrqlClient";
-import { withUrqlClient } from "next-urql";
 import { ArrowLeftOutlined } from '@ant-design/icons'
 import { usePostQuery, useUpdatePostMutation } from "../../../src/generated/graphql";
 
@@ -14,14 +12,14 @@ const EditPost = () => {
     const [isLoading, setIsLoading] = useState(false)
     const router = useRouter()
     const intId = typeof router.query.id === 'string' ? parseInt(router.query.id) : -1
-    const [{data, fetching}] = usePostQuery({
-        pause: intId === -1,
+    const {data, loading} = usePostQuery({
+        skip: intId === -1,
         variables: {
             _id: intId
         }
     })
 
-    if(fetching) {
+    if(loading) {
         return (
             <Layout>
                 <div className={styles.spinner}>
@@ -49,14 +47,14 @@ const EditPost = () => {
 
     const formRef = useRef<FormInstance>();
 
-    const [, updatePost] = useUpdatePostMutation()
+    const [updatePost] = useUpdatePostMutation()
 
     const onFinish = async ( values: { title: string, text: string } ) => {
         setIsLoading(true)
         console.log("Values", values)
         const newTitle = values.title !== "" && values.title !== undefined ? values.title : data.post.title
         const newText = values.text !== "" && values.text !== undefined ? values.title : data.post.text
-        await updatePost({ _id: intId, title: newTitle, text: newText })
+        await updatePost({variables: { _id: intId, title: newTitle, text: newText }})
         setIsLoading(false)
         if(newTitle !== data.post.title && newText !== data.post.text) {
             message.success("Post updated successfully!")
@@ -111,4 +109,4 @@ const EditPost = () => {
     );
 }
 
-export default withUrqlClient(createUrqlClient, { ssr: true })(EditPost)
+export default EditPost

@@ -9,6 +9,7 @@
         "gen": "graphql-codegen --config codegen.yml"
     },
     "dependencies": {
+        "@apollo/client": "^3.3.19",
         "@urql/exchange-graphcache": "^4.1.2",
         "antd": "^4.16.0",
         "dayjs": "^1.10.5",
@@ -26,6 +27,7 @@
         "@graphql-codegen/cli": "1.21.5",
         "@graphql-codegen/typescript": "1.22.1",
         "@graphql-codegen/typescript-operations": "1.18.0",
+        "@graphql-codegen/typescript-react-apollo": "^2.2.5",
         "@graphql-codegen/typescript-urql": "^2.0.7",
         "@types/node": "^15.6.1",
         "@types/react": "^17.0.8",

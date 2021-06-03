@@ -12,7 +12,7 @@ interface Post {
 
 const RedditCard: React.FC<Post> = ({ post }) => {
     dayjs.extend(relativeTime)
-    const [, vote] = useUpVoteMutation()
+    const [vote] = useUpVoteMutation()
         return (
             <Card 
                 className={styles.card}
@@ -23,7 +23,7 @@ const RedditCard: React.FC<Post> = ({ post }) => {
                               if(post.voteStatus === 1) {
                                 return
                               }
-                              vote({ value: 1, postId: post._id })
+                              vote({ variables: {value: 1, postId: post._id} })
                           }}
                         >
                           <ArrowUpOutlined style={post.voteStatus === 1 ? {color: "#27ae60"}: {}} />  
@@ -34,7 +34,7 @@ const RedditCard: React.FC<Post> = ({ post }) => {
                               if(post.voteStatus === -1) {
                                 return
                               }
-                              vote({ value: -1, postId: post._id })
+                              vote({ variables: {value: -1, postId: post._id} })
                             }}
                         >
                           <ArrowDownOutlined style={post.voteStatus === -1 ? {color: "#c0392b"} : {}} />

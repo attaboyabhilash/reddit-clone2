@@ -5,6 +5,7 @@ import Link from 'next/link';
 import styles from "./Header.module.scss"
 import { useRouter } from 'next/router';
 import { useLogoutMutation, useMeQuery } from '../../generated/graphql';
+import { isServer } from '../../utils/isServer';
 
 interface headerProps {
 
@@ -13,8 +14,10 @@ interface headerProps {
 const Header: React.FC<headerProps> = ({}) => {
     const { Header } = Layout;
     const router = useRouter()
-    const [{ fetching: logoutFetching }, logout] = useLogoutMutation()
-    const [{ data }] = useMeQuery()
+    const [logout, {loading}] = useLogoutMutation()
+    const { data } = useMeQuery({
+        skip: isServer()
+    })
 
     const logoutPageChange = async () => {
         await logout()
@@ -29,7 +32,7 @@ const Header: React.FC<headerProps> = ({}) => {
                 <Link href="/create_post"><a>Create New Post</a></Link>
             </Menu.Item>
             <Menu.Item key="3">
-                <Button loading={logoutFetching} type="primary" size="small" danger onClick={() => logoutPageChange()}>Logout</Button>
+                <Button loading={loading} type="primary" size="small" danger onClick={() => logoutPageChange()}>Logout</Button>
             </Menu.Item>
         </Menu>
     );

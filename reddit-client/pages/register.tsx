@@ -6,8 +6,6 @@ import Link from 'next/link';
 import styles from "../styles/Register.module.scss"
 import { useRegisterMutation } from '../src/generated/graphql';
 import { useRouter } from 'next/router';
-import { withUrqlClient } from 'next-urql';
-import { createUrqlClient } from '../src/utils/createUrqlClient';
 import Layout from "../src/components/Layout"
 
 
@@ -17,12 +15,12 @@ const Register: React.FC<{}> = ( { } ) => {
   const formRef = useRef<FormInstance>();
   const router = useRouter()
 
-  const [, register] = useRegisterMutation()
+  const [register] = useRegisterMutation()
 
   const onFinish = async ( values: any ) => {
     setIsLoading(true)
     //console.log( 'Received values of form: ', values )
-    const response = await register({ options: values })
+    const response = await register({ variables: {options: values} })
     if(response.data?.register.errors) {
       setServerError(response.data.register.errors)
     } else if (response.data?.register.user) {
@@ -128,5 +126,5 @@ const Register: React.FC<{}> = ( { } ) => {
   );
 }
 
-export default withUrqlClient(createUrqlClient)(Register)
+export default Register
 

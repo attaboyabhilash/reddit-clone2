@@ -6,8 +6,6 @@ import Link from 'next/link';
 import styles from "../styles/Login.module.scss"
 import { Exact, useLoginMutation } from '../src/generated/graphql';
 import { useRouter } from 'next/router';
-import { withUrqlClient } from 'next-urql';
-import { createUrqlClient } from '../src/utils/createUrqlClient';
 import Layout from '../src/components/Layout';
 
 
@@ -17,12 +15,11 @@ const Login: React.FC<{}> = ( { } ) => {
   const formRef = useRef<FormInstance>();
   const router = useRouter()
 
-  const [, login] = useLoginMutation()
+  const [login] = useLoginMutation()
 
   const onFinish = async ( values: Exact<{ usernameOrEmail: string; password: string; }> ) => {
     setIsLoading(true)
-    //console.log( 'Received values of form: ', values )
-    const response = await login(values)
+    const response = await login({variables: {usernameOrEmail: values.usernameOrEmail, password: values.password}})
     if(response.data?.login.errors) {
       setServerError(response.data.login.errors)
     } else if (response.data?.login.user) {
@@ -107,4 +104,4 @@ const Login: React.FC<{}> = ( { } ) => {
   );
 }
 
-export default withUrqlClient(createUrqlClient, { ssr: true })(Login)
+export default Login

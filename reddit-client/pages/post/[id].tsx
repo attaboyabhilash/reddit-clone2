@@ -1,8 +1,6 @@
-import { withUrqlClient } from "next-urql";
 import { useRouter } from "next/router";
 import {Spin, Empty, Card, Button, message} from 'antd'
 import { useDeletePostMutation, useMeQuery, usePostQuery } from "../../src/generated/graphql";
-import { createUrqlClient } from "../../src/utils/createUrqlClient";
 import Layout from "../../src/components/Layout";
 import styles from '../../styles/Post.module.scss'
 import { DeleteOutlined, EditFilled, ArrowLeftOutlined } from '@ant-design/icons'
@@ -12,20 +10,20 @@ import Link from "next/link"
 const post: React.FC<{}> = ({}) => {
     const router = useRouter() 
     const intId = typeof router.query.id === 'string' ? parseInt(router.query.id) : -1
-    const [{data, fetching}] = usePostQuery({
-        pause: intId === -1,
+    const {data, loading} = usePostQuery({
+        skip: intId === -1,
         variables: {
             _id: intId
         }
     })
 
-    const [{ data: meData }] = useMeQuery()
+    const { data: meData } = useMeQuery()
 
-    const [, deletePost] = useDeletePostMutation()
+    const [deletePost] = useDeletePostMutation()
 
     const handleDelete = async () => {
-        const {error} = await deletePost({_id: data.post._id})
-        if(error) {
+        const response = await deletePost({variables: {_id: data.post._id}})
+        if(response.errors) {
             message.error("Post could not be deleted! Try again")
         } else {
             message.success("Post deleted successfully!")
@@ -33,7 +31,7 @@ const post: React.FC<{}> = ({}) => {
         router.replace("/")
     }
 
-    if(fetching) {
+    if(loading) {
         return (
             <Layout>
                 <div className={styles.spinner}>
@@ -81,4 +79,4 @@ const post: React.FC<{}> = ({}) => {
     );
 }
 
-export default withUrqlClient(createUrqlClient, { ssr: true })(post)
+export default post

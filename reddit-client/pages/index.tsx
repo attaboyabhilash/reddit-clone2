@@ -2,18 +2,16 @@ import { useState } from "react"
 import { usePostsQuery } from '../src/generated/graphql'
 import { Spin, Button } from "antd"
 import styles from '../styles/Home.module.scss'
-import { withUrqlClient } from 'next-urql';
-import { createUrqlClient } from '../src/utils/createUrqlClient';
 import Layout from '../src/components/Layout';
 import RedditCard from '../src/components/RedditCard'
 
 const index = () => {
   const [variables, setVariables] = useState({limit: 10, cursor: null as null | string})
-  const [{data, fetching}] = usePostsQuery({
+  const {data, loading} = usePostsQuery({
     variables: variables
   })
   
-  if(!fetching && !data) {
+  if(!loading && !data) {
     return <h1>Something went wrong!</h1>
   }
 
@@ -22,7 +20,7 @@ const index = () => {
         <div className={styles.container}>
           <h1>Posts</h1>
           <div className={styles.posts}>
-            {!data && fetching ? 
+            {!data && loading ? 
               <div className={styles.spinner}>
                 <Spin size="large" />              
               </div> 
@@ -47,5 +45,5 @@ const index = () => {
   )
 }
 
-export default withUrqlClient(createUrqlClient, {ssr: true})(index)
+export default index
 

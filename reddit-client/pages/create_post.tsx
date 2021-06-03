@@ -1,6 +1,4 @@
 import React, { useRef, useState } from 'react';
-import { withUrqlClient } from 'next-urql';
-import { createUrqlClient } from '../src/utils/createUrqlClient';
 import { Form, Input, Button, Card } from 'antd';
 import { FormInstance } from 'antd/lib/form';
 import { useCreatePostMutation } from '../src/generated/graphql';
@@ -12,7 +10,7 @@ import { useIsAuth } from '../src/utils/useIsAuth';
 
 const CreatePost: React.FC<{}> = ({}) => {
     const [isLoading, setIsLoading] = useState(false)
-    const [, createPost] = useCreatePostMutation()
+    const [createPost] = useCreatePostMutation()
     const formRef = useRef<FormInstance>();
     const router = useRouter()
     
@@ -21,8 +19,8 @@ const CreatePost: React.FC<{}> = ({}) => {
     const onFinish = async ( values: { title: string; text: string; } ) => {
         setIsLoading(true)
         //console.log( 'Received values of form: ', values )
-        const {error} = await createPost({input: values}) 
-        if(!error) {
+        const response = await createPost({variables: {input: values}}) 
+        if(!response.errors) {
             setIsLoading(false)
             router.push("/")    
         }
@@ -78,4 +76,4 @@ const CreatePost: React.FC<{}> = ({}) => {
 }
 
 
-export default withUrqlClient(createUrqlClient)(CreatePost)
+export default CreatePost
