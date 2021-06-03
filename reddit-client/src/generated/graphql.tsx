@@ -291,7 +291,7 @@ export type PostQuery = (
   { __typename?: 'Query' }
   & { post?: Maybe<(
     { __typename?: 'Post' }
-    & Pick<Post, '_id' | 'title' | 'text' | 'createdAt' | 'updatedAt'>
+    & Pick<Post, '_id' | 'title' | 'text' | 'createdAt' | 'updatedAt' | 'creatorId'>
   )> }
 );
 
@@ -457,6 +457,7 @@ export const PostDocument = gql`
     text
     createdAt
     updatedAt
+    creatorId
   }
 }
     `;

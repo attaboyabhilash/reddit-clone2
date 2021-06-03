@@ -1,11 +1,12 @@
 import { withUrqlClient } from "next-urql";
 import { useRouter } from "next/router";
-import {Spin, Empty, Card, Button} from 'antd'
+import {Spin, Empty, Card, Button, message} from 'antd'
 import { useDeletePostMutation, useMeQuery, usePostQuery } from "../../src/generated/graphql";
 import { createUrqlClient } from "../../src/utils/createUrqlClient";
 import Layout from "../../src/components/Layout";
 import styles from '../../styles/Post.module.scss'
-import { DeleteOutlined, EditFilled } from '@ant-design/icons'
+import { DeleteOutlined, EditFilled, ArrowLeftOutlined } from '@ant-design/icons'
+import Link from "next/link"
 
 
 const post: React.FC<{}> = ({}) => {
@@ -22,8 +23,13 @@ const post: React.FC<{}> = ({}) => {
 
     const [, deletePost] = useDeletePostMutation()
 
-    const handleDelete = () => {
-        deletePost({_id: data.post._id})
+    const handleDelete = async () => {
+        const {error} = await deletePost({_id: data.post._id})
+        if(error) {
+            message.error("Post could not be deleted! Try again")
+        } else {
+            message.success("Post deleted successfully!")
+        }
         router.replace("/")
     }
 
@@ -40,6 +46,7 @@ const post: React.FC<{}> = ({}) => {
     if(!data?.post) {
         return (
             <Layout>
+                <div className={styles.backLink}><Link href="/"><a><ArrowLeftOutlined /> back</a></Link></div>
                 <div className={styles.spinner}>
                     <Empty
                         description={
@@ -56,15 +63,16 @@ const post: React.FC<{}> = ({}) => {
     return (
         <Layout>
             <div className={styles.container}>
+                <div className={styles.backLink}><Link href="/"><a><ArrowLeftOutlined /> back</a></Link></div>
                 <Card hoverable 
                     className={styles.card}
-                    actions={[
+                    actions={meData?.me?._id === data.post.creatorId ? [
                         <Button className={styles.edit_btn} icon={<EditFilled />} onClick={() => router.replace(`/post/edit/${intId}`)}>Edit</Button>
-                    ]}
+                    ] : []}
                 >
                     <div className={styles.flexer}>
                         <h2>{data.post.title}</h2>
-                        {meData?.me?._id === data.post._id ? <Button type="primary" icon={<DeleteOutlined />} danger onClick={handleDelete}/> : <></>}
+                        {meData?.me?._id === data.post.creatorId ? <Button type="primary" icon={<DeleteOutlined />} danger onClick={handleDelete}/> : <></>}
                     </div>
                     <p>{data.post.text}</p>
                 </Card>

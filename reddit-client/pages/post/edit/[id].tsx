@@ -1,11 +1,13 @@
 import { useRouter } from "next/router"
+import Link from "next/link"
 import React, { useRef, useState } from 'react';
 import styles from "../../../styles/Post.module.scss"
-import { Card, Form, Input, Button, Spin, Empty } from "antd"
+import { Card, Form, Input, Button, Spin, Empty, message } from "antd"
 import { FormInstance } from 'antd/lib/form';
 import Layout from "../../../src/components/Layout"
 import { createUrqlClient } from "../../../src/utils/createUrqlClient";
 import { withUrqlClient } from "next-urql";
+import { ArrowLeftOutlined } from '@ant-design/icons'
 import { usePostQuery, useUpdatePostMutation } from "../../../src/generated/graphql";
 
 const EditPost = () => {
@@ -56,12 +58,25 @@ const EditPost = () => {
         const newText = values.text !== "" && values.text !== undefined ? values.title : data.post.text
         await updatePost({ _id: intId, title: newTitle, text: newText })
         setIsLoading(false)
-        router.push(`/post/${intId}`)
+        if(newTitle !== data.post.title && newText !== data.post.text) {
+            message.success("Post updated successfully!")
+        }
+        if(newTitle !== data.post.title && newText === data.post.text) {
+            message.success("Title updated successfully!")
+        }
+        if(newTitle === data.post.title && newText !== data.post.text) {
+            message.success("Description updated successfully!")
+        }
+        if(newTitle === data.post.title && newText === data.post.text) {
+            message.warning("No Post Updated!")
+        }
+        router.replace(`/post/${intId}`)
     };
 
     return (
         <Layout>
             <div className={styles.container}>
+                <div className={styles.backLink}><Link href={`/post/${intId}`}><a><ArrowLeftOutlined /> back</a></Link></div>
                 <Card className={styles.card} hoverable>
                     <Form
                         name="create-post-form"

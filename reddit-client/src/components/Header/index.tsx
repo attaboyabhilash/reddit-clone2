@@ -16,8 +16,8 @@ const Header: React.FC<headerProps> = ({}) => {
     const [{ fetching: logoutFetching }, logout] = useLogoutMutation()
     const [{ data }] = useMeQuery()
 
-    const logoutPageChange = () => {
-        logout()
+    const logoutPageChange = async () => {
+        await logout()
         router.push('/login')
     }
     const menu = (

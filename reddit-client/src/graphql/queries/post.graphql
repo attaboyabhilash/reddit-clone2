@@ -5,6 +5,7 @@ query Post($_id: Int!) {
       text
       createdAt
       updatedAt
+      creatorId
       # creator {
       #    _id
       #    username
