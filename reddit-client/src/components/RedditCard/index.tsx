@@ -1,13 +1,45 @@
-import { Card, Tooltip, Button } from "antd"
+import { Card, Tooltip } from "antd"
 import Link from "next/link"
 import styles from "./RedditCard.module.scss"
 import { ArrowUpOutlined, ArrowDownOutlined } from '@ant-design/icons';
-import { useUpVoteMutation, PostsQuery } from "../../generated/graphql"
+import { useUpVoteMutation, PostsQuery, PostFragmentFragment, UpVoteMutation } from "../../generated/graphql"
 import dayjs from "dayjs"
+import gql from 'graphql-tag'
 import relativeTime from "dayjs/plugin/relativeTime"
+import { ApolloCache } from "@apollo/client";
 
 interface Post {
     post: PostsQuery['posts']['posts'][0]
+}
+
+const updateAfterVote = (value: number, postId: number, cache: ApolloCache<UpVoteMutation>) => {
+    const data = cache.readFragment<PostFragmentFragment>({
+      id: 'Post:' + postId,
+      fragment: gql`
+          fragment _ on Post {
+              _id
+              points
+              voteStatus
+          }
+      `
+    })
+
+    if(data) {
+        if(data.voteStatus === value) {
+            return
+        }
+        const newPoints = data.points + ((!data.voteStatus ? 1 : 2) * value)
+        cache.writeFragment({
+            id: 'Post:' + postId,
+            fragment: gql`
+                fragment __ on Post {
+                    points
+                    voteStatus
+                }
+            `,
+            data: { points: newPoints, voteStatus: value }
+        })
+    }
 }
 
 const RedditCard: React.FC<Post> = ({ post }) => {
@@ -19,22 +51,28 @@ const RedditCard: React.FC<Post> = ({ post }) => {
                     style={{width: "300px"}}
                     actions={[
                         <div className={styles.upVote} 
-                            onClick={() => {
+                            onClick={async () => {
                               if(post.voteStatus === 1) {
                                 return
                               }
-                              vote({ variables: {value: 1, postId: post._id} })
+                              await vote({ 
+                                    variables: {value: 1, postId: post._id}, 
+                                    update: (cache) => updateAfterVote(1, post._id, cache)
+                              })
                           }}
                         >
                           <ArrowUpOutlined style={post.voteStatus === 1 ? {color: "#27ae60"}: {}} />  
                         </div>,
                         post.points,
                         <div className={styles.downVote}
-                            onClick={() => {
+                            onClick={async () => {
                               if(post.voteStatus === -1) {
                                 return
                               }
-                              vote({ variables: {value: -1, postId: post._id} })
+                              await vote({ 
+                                variables: {value: -1, postId: post._id},
+                                update: (cache) => updateAfterVote(-1, post._id, cache)
+                              })
                             }}
                         >
                           <ArrowDownOutlined style={post.voteStatus === -1 ? {color: "#c0392b"} : {}} />

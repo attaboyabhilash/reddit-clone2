@@ -1,14 +1,14 @@
-import { useState } from "react"
 import { usePostsQuery } from '../src/generated/graphql'
 import { Spin, Button } from "antd"
 import styles from '../styles/Home.module.scss'
 import Layout from '../src/components/Layout';
 import RedditCard from '../src/components/RedditCard'
+import { withApollo } from '../src/utils/withApollo';
 
 const index = () => {
-  const [variables, setVariables] = useState({limit: 10, cursor: null as null | string})
-  const {data, loading} = usePostsQuery({
-    variables: variables
+  const {data, loading, fetchMore, variables} = usePostsQuery({
+    variables: {limit: 10, cursor: null},
+    notifyOnNetworkStatusChange: true
   })
   
   if(!loading && !data) {
@@ -31,10 +31,15 @@ const index = () => {
             {data && data.posts.posts.length > 0 && data.posts.hasMore ? (
               <div className={styles.flexer}>
                 <div></div>
-                <Button className={styles.read_more} onClick={() => setVariables({
-                  limit: variables.limit, 
-                  cursor: data.posts.posts[data.posts.posts.length - 1].createdAt 
-                })}>
+                <Button loading={loading} className={styles.read_more} onClick={() => {
+                    fetchMore({
+                        variables: {
+                          limit: variables?.limit, 
+                          cursor: data.posts.posts[data.posts.posts.length - 1].createdAt 
+                        }
+                    })
+                  }}
+                >
                   Load More
                 </Button>
               </div>
@@ -45,5 +50,5 @@ const index = () => {
   )
 }
 
-export default index
+export default withApollo({ ssr: true })(index)
 

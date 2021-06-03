@@ -5,7 +5,8 @@ import { FormInstance } from 'antd/lib/form';
 import { useRouter } from 'next/router';
 import { LockOutlined } from '@ant-design/icons';
 import styles from "../../styles/ChangePassword.module.scss"
-import { useChangePasswordMutation } from "../../src/generated/graphql";
+import { MeDocument, MeQuery, useChangePasswordMutation } from "../../src/generated/graphql";
+import { withApollo } from "../../src/utils/withApollo";
 
 
 const ChangePassword: NextPage = () => {
@@ -20,7 +21,16 @@ const ChangePassword: NextPage = () => {
         //console.log( 'Received values of form: ', values.newPassword )
         const response = await changePassword({ variables: { 
             newPassword: values.newPassword, 
-            token: typeof router.query.token === 'string' ?  router.query.token : "" } 
+            token: typeof router.query.token === 'string' ?  router.query.token : "" },
+            update: (cache, {data}) => {
+                cache.writeQuery<MeQuery>({
+                    query: MeDocument,
+                    data: {
+                        __typename: 'Query',
+                        me: data?.changePassword.user
+                    }
+                })
+            }  
         })
         if(response.data?.changePassword.errors) {
             setServerError(response.data.changePassword.errors)
@@ -106,4 +116,4 @@ const ChangePassword: NextPage = () => {
         );
 }
 
-export default ChangePassword
+export default withApollo({ ssr: false })(ChangePassword)

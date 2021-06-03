@@ -1,0 +1,5 @@
+fragment PostFragment on Post {
+   _id
+   points
+   voteStatus
+}

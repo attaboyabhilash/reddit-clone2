@@ -4,9 +4,10 @@ import { UserOutlined, LockOutlined, MailOutlined } from '@ant-design/icons';
 import { FormInstance } from 'antd/lib/form';
 import Link from 'next/link';
 import styles from "../styles/Register.module.scss"
-import { useRegisterMutation } from '../src/generated/graphql';
+import { MeDocument, MeQuery, useRegisterMutation } from '../src/generated/graphql';
 import { useRouter } from 'next/router';
 import Layout from "../src/components/Layout"
+import { withApollo } from '../src/utils/withApollo';
 
 
 const Register: React.FC<{}> = ( { } ) => {
@@ -20,7 +21,18 @@ const Register: React.FC<{}> = ( { } ) => {
   const onFinish = async ( values: any ) => {
     setIsLoading(true)
     //console.log( 'Received values of form: ', values )
-    const response = await register({ variables: {options: values} })
+    const response = await register({ 
+      variables: {options: values},
+      update: (cache, {data}) => {
+        cache.writeQuery<MeQuery>({
+          query: MeDocument,
+          data: {
+            __typename: 'Query',
+            me: data?.register.user
+          }
+        })
+      } 
+    })
     if(response.data?.register.errors) {
       setServerError(response.data.register.errors)
     } else if (response.data?.register.user) {
@@ -126,5 +138,5 @@ const Register: React.FC<{}> = ( { } ) => {
   );
 }
 
-export default Register
+export default withApollo({ ssr: false })(Register)
 

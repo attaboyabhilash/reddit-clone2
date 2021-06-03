@@ -5,6 +5,7 @@ import Layout from "../../src/components/Layout";
 import styles from '../../styles/Post.module.scss'
 import { DeleteOutlined, EditFilled, ArrowLeftOutlined } from '@ant-design/icons'
 import Link from "next/link"
+import { withApollo } from "../../src/utils/withApollo";
 
 
 const post: React.FC<{}> = ({}) => {
@@ -22,7 +23,11 @@ const post: React.FC<{}> = ({}) => {
     const [deletePost] = useDeletePostMutation()
 
     const handleDelete = async () => {
-        const response = await deletePost({variables: {_id: data.post._id}})
+        const response = await deletePost({
+            variables: {_id: data.post._id}, 
+            update: (cache) => {
+                cache.evict({id: 'Post:' + data.post._id})
+            }})
         if(response.errors) {
             message.error("Post could not be deleted! Try again")
         } else {
@@ -79,4 +84,4 @@ const post: React.FC<{}> = ({}) => {
     );
 }
 
-export default post
+export default withApollo({ ssr: true })(post)

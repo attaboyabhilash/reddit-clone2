@@ -142,6 +142,11 @@ export type UsernamePasswordInput = {
   password: Scalars['String'];
 };
 
+export type PostFragmentFragment = (
+  { __typename?: 'Post' }
+  & Pick<Post, '_id' | 'points' | 'voteStatus'>
+);
+
 export type RegularErrorFragment = (
   { __typename?: 'FieldError' }
   & Pick<FieldError, 'field' | 'message'>
@@ -317,6 +322,13 @@ export type PostsQuery = (
   ) }
 );
 
+export const PostFragmentFragmentDoc = gql`
+    fragment PostFragment on Post {
+  _id
+  points
+  voteStatus
+}
+    `;
 export const RegularUserFragmentDoc = gql`
     fragment RegularUser on User {
   _id

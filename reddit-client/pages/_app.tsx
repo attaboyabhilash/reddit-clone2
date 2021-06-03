@@ -1,15 +1,8 @@
 import React, { useState, useEffect } from "react"
 import { useRouter } from "next/router"
 import { Spin } from "antd"
-import { ApolloClient, ApolloProvider, InMemoryCache } from "@apollo/client"
 import "../styles/globals.scss"
 
-const client = new ApolloClient({
-    uri: "http://localhost:4000/graphql",
-    cache: new InMemoryCache(),
-    credentials: 'include'
-    
-})
 
 function MyApp({ Component, pageProps }) {
   const router = useRouter()
@@ -33,9 +26,7 @@ function MyApp({ Component, pageProps }) {
         pageLoading ? (
             <div className="spinner"><Spin size="large" /></div>
         ) : (
-            <ApolloProvider client={client}>
-                <Component {...pageProps} />
-            </ApolloProvider>
+            <Component {...pageProps} />
         )
   )
 }

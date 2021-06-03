@@ -6,6 +6,7 @@ import styles from "../styles/Login.module.scss"
 import { Exact, useForgotPasswordMutation } from '../src/generated/graphql';
 import { useRouter } from 'next/router';
 import Layout from "../src/components/Layout"
+import { withApollo } from '../src/utils/withApollo';
 
 
 const ForgotPassword: React.FC<{}> = ({}) => {
@@ -84,4 +85,4 @@ const ForgotPassword: React.FC<{}> = ({}) => {
         );
 }
 
-export default ForgotPassword
+export default withApollo({ ssr: false })(ForgotPassword)

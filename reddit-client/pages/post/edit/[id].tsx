@@ -7,6 +7,7 @@ import { FormInstance } from 'antd/lib/form';
 import Layout from "../../../src/components/Layout"
 import { ArrowLeftOutlined } from '@ant-design/icons'
 import { usePostQuery, useUpdatePostMutation } from "../../../src/generated/graphql";
+import { withApollo } from "../../../src/utils/withApollo";
 
 const EditPost = () => {
     const [isLoading, setIsLoading] = useState(false)
@@ -53,8 +54,10 @@ const EditPost = () => {
         setIsLoading(true)
         console.log("Values", values)
         const newTitle = values.title !== "" && values.title !== undefined ? values.title : data.post.title
-        const newText = values.text !== "" && values.text !== undefined ? values.title : data.post.text
-        await updatePost({variables: { _id: intId, title: newTitle, text: newText }})
+        const newText = values.text !== "" && values.text !== undefined ? values.text : data.post.text
+        await updatePost({
+            variables: { _id: intId, title: newTitle, text: newText }
+        })
         setIsLoading(false)
         if(newTitle !== data.post.title && newText !== data.post.text) {
             message.success("Post updated successfully!")
@@ -109,4 +112,4 @@ const EditPost = () => {
     );
 }
 
-export default EditPost
+export default withApollo({ ssr: false })(EditPost)

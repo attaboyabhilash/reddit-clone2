@@ -1,11 +1,12 @@
 import React, { useRef, useState } from 'react';
-import { Form, Input, Button, Card } from 'antd';
+import { Form, Input, Button, Card, message } from 'antd';
 import { FormInstance } from 'antd/lib/form';
 import { useCreatePostMutation } from '../src/generated/graphql';
 import { useRouter } from 'next/router';
 import styles from "../styles/CreatePost.module.scss";
 import Layout from '../src/components/Layout';
 import { useIsAuth } from '../src/utils/useIsAuth';
+import { withApollo } from '../src/utils/withApollo';
 
 
 const CreatePost: React.FC<{}> = ({}) => {
@@ -19,9 +20,15 @@ const CreatePost: React.FC<{}> = ({}) => {
     const onFinish = async ( values: { title: string; text: string; } ) => {
         setIsLoading(true)
         //console.log( 'Received values of form: ', values )
-        const response = await createPost({variables: {input: values}}) 
+        const response = await createPost({
+            variables: {input: values},
+            update: (cache) => {
+                cache.evict({fieldName: "posts:{}"})
+            }
+        }) 
         if(!response.errors) {
             setIsLoading(false)
+            message.success("Post has been created successfully!")
             router.push("/")    
         }
     };
@@ -76,4 +83,4 @@ const CreatePost: React.FC<{}> = ({}) => {
 }
 
 
-export default CreatePost
+export default withApollo({ ssr: false })(CreatePost)

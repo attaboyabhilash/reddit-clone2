@@ -4,9 +4,10 @@ import { UserOutlined, LockOutlined } from '@ant-design/icons';
 import { FormInstance } from 'antd/lib/form';
 import Link from 'next/link';
 import styles from "../styles/Login.module.scss"
-import { Exact, useLoginMutation } from '../src/generated/graphql';
+import { Exact, MeDocument, MeQuery, useLoginMutation } from '../src/generated/graphql';
 import { useRouter } from 'next/router';
 import Layout from '../src/components/Layout';
+import { withApollo } from '../src/utils/withApollo';
 
 
 const Login: React.FC<{}> = ( { } ) => {
@@ -19,7 +20,19 @@ const Login: React.FC<{}> = ( { } ) => {
 
   const onFinish = async ( values: Exact<{ usernameOrEmail: string; password: string; }> ) => {
     setIsLoading(true)
-    const response = await login({variables: {usernameOrEmail: values.usernameOrEmail, password: values.password}})
+    const response = await login({
+      variables: values,
+      update: (cache, {data}) => {
+        cache.writeQuery<MeQuery>({
+          query: MeDocument,
+          data: {
+            __typename: 'Query',
+            me: data?.login.user
+          }
+        })
+        cache.evict({fieldName: 'posts:{}'})
+      } 
+    })
     if(response.data?.login.errors) {
       setServerError(response.data.login.errors)
     } else if (response.data?.login.user) {
@@ -104,4 +117,4 @@ const Login: React.FC<{}> = ( { } ) => {
   );
 }
 
-export default Login
+export default withApollo({ ssr: false })(Login)

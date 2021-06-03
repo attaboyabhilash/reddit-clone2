@@ -2,10 +2,12 @@ import React from 'react'
 import { Layout, Menu, Dropdown, Avatar, Button } from 'antd';
 import { CaretDownOutlined } from '@ant-design/icons';
 import Link from 'next/link';
+import { useRouter } from "next/router"
 import styles from "./Header.module.scss"
-import { useRouter } from 'next/router';
 import { useLogoutMutation, useMeQuery } from '../../generated/graphql';
 import { isServer } from '../../utils/isServer';
+import { useApolloClient } from "@apollo/client"
+import router from 'next/router';
 
 interface headerProps {
 
@@ -19,9 +21,12 @@ const Header: React.FC<headerProps> = ({}) => {
         skip: isServer()
     })
 
+    const apolloClient = useApolloClient()
+
     const logoutPageChange = async () => {
         await logout()
-        router.push('/login')
+        await apolloClient.resetStore()
+        router.replace("/login")
     }
     const menu = (
         <Menu>
